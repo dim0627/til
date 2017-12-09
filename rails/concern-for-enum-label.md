@@ -21,13 +21,16 @@ module EnumLabel
     def enum_label(*column_names)
       column_names.each do |column_name|
         define_method("#{column_name}_label") do
-          ActionController::Base.helpers.t "enums.#{self.class.to_s.underscore}.#{column_name}.#{send(column_name)}"
+          self.class.public_send("#{column_name}_label", public_send(column_name))
+        end
+
+        define_singleton_method("#{column_name}_label") do |key|
+          ActionController::Base.helpers.t "enums.#{model_name.name.underscore}.#{column_name}.#{key}"
         end
       end
     end
   end
-end
-```
+end```
 
 Include to model.
 
@@ -50,4 +53,11 @@ ja:
         release: Release Info
         news: News
         column: Column
+```
+
+Call.
+
+``` ruby
+Article.category_label(:release)
+Article.first.category_label
 ```
